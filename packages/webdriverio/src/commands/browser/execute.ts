@@ -35,7 +35,7 @@ import { verifyArgsAndStripIfElement } from '../../utils/index.js'
  * @type protocol
  *
  */
-export function execute<ReturnValue, InnerArguments extends any[]> (
+export async function execute<ReturnValue, InnerArguments extends any[]> (
     this: WebdriverIO.Browser | WebdriverIO.Element | WebdriverIO.MultiRemoteBrowser,
     script: string | ((...innerArgs: InnerArguments) => ReturnValue),
     ...args: InnerArguments
@@ -55,5 +55,5 @@ export function execute<ReturnValue, InnerArguments extends any[]> (
         script = `return (${script}).apply(null, arguments)`
     }
 
-    return this.executeScript(script, verifyArgsAndStripIfElement(args))
+    return this.executeScript(script, await verifyArgsAndStripIfElement(args, 'execute'))
 }

@@ -17,6 +17,7 @@ import { ELEMENT_KEY, DEEP_SELECTOR, Key } from '../constants.js'
 import { findStrategy } from './findStrategy.js'
 import type { ElementArray, ElementFunction, Selector, ParsedCSSValue, CustomLocatorReturnValue } from '../types.js'
 import type { CustomStrategyReference } from '../types.js'
+import implicitWait from './implicitWait.js'
 
 const log = logger('webdriverio')
 const INVALID_SELECTOR_ERROR = 'selector needs to be typeof `string` or `function`'
@@ -359,12 +360,13 @@ export async function findElements(
 /**
  * Strip element object and return w3c and jsonwp compatible keys
  */
-export function verifyArgsAndStripIfElement(args: any) {
-    function verify (arg: any) {
+export async function verifyArgsAndStripIfElement(args: any, commandName: string) {
+    async function verify (arg: any) {
         if (arg && typeof arg === 'object' && arg.constructor.name === 'Element') {
-            const elem = arg as WebdriverIO.Element
+            let elem = arg as WebdriverIO.Element
+
             if (!elem.elementId) {
-                throw new Error(`The element with selector "${elem.selector}" you are trying to pass into the execute method wasn't found`)
+                elem = await implicitWait(elem, commandName)
             }
 
             return {
@@ -376,7 +378,7 @@ export function verifyArgsAndStripIfElement(args: any) {
         return arg
     }
 
-    return !Array.isArray(args) ? verify(args) : args.map(verify)
+    return !Array.isArray(args) ? verify(args) : Promise.all(args.map(verify))
 }
 
 /**

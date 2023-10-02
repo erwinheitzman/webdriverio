@@ -1,6 +1,5 @@
 import path from 'node:path'
 import { expect, describe, it, vi } from 'vitest'
-// @ts-expect-error
 import got from 'got'
 
 import { remote } from '../../../src/index.js'

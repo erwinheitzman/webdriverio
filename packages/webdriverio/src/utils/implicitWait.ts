@@ -22,22 +22,27 @@ export default async function implicitWait (currentElement: WebdriverIO.Element,
             return (currentElement.parent as WebdriverIO.Element).$(currentElement.selector)
         } catch {
             if (currentElement.selector.toString().includes('this.previousElementSibling')) {
-                throw new Error(
-                    `Can't call ${commandName} on previous element of element with selector "${(currentElement.parent as WebdriverIO.Element).selector}" because sibling wasn't found`)
+                return Promise.reject(new Error(
+                    `Can't call ${commandName} on previous element of element with selector "${(currentElement.parent as WebdriverIO.Element).selector}" because sibling wasn't found`))
             }
 
             if (currentElement.selector.toString().includes('this.nextElementSibling')) {
-                throw new Error(
-                    `Can't call ${commandName} on next element of element with selector "${(currentElement.parent as WebdriverIO.Element).selector}" because sibling wasn't found`)
+                return Promise.reject(new Error(
+                    `Can't call ${commandName} on next element of element with selector "${(currentElement.parent as WebdriverIO.Element).selector}" because sibling wasn't found`))
             }
 
             if (currentElement.selector.toString().includes('this.parentElement')) {
-                throw new Error(
-                    `Can't call ${commandName} on parent element of element with selector "${(currentElement.parent as WebdriverIO.Element).selector}" because it wasn't found`)
+                return Promise.reject(new Error(
+                    `Can't call ${commandName} on parent element of element with selector "${(currentElement.parent as WebdriverIO.Element).selector}" because it wasn't found`))
             }
 
-            throw new Error(
-                `Can't call ${commandName} on element with selector "${currentElement.selector}" because element wasn't found`)
+            if (commandName === 'execute' || commandName === 'executeAsync') {
+                return Promise.reject(new Error(
+                    `Can't call ${commandName} with element, with selector "${currentElement.selector}" because it wasn't found`))
+            }
+
+            return Promise.reject(new Error(
+                `Can't call ${commandName} on element with selector "${currentElement.selector}" because element wasn't found`))
         }
     }
 

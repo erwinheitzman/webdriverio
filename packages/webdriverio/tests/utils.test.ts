@@ -410,38 +410,38 @@ describe('utils', () => {
             }
         }
 
-        it('returns the same value if it is not an element object', () => {
-            expect(verifyArgsAndStripIfElement([1, 'two', true, false, null, undefined])).toEqual([1, 'two', true, false, null, undefined])
+        it('returns the same value if it is not an element object', async () => {
+            expect(await verifyArgsAndStripIfElement([1, 'two', true, false, null, undefined], 'click')).toEqual([1, 'two', true, false, null, undefined])
         })
 
-        it('strips down properties if value is element object', () => {
+        it('strips down properties if value is element object', async () => {
             const fakeObj = new Element({
                 elementId: 'foo-bar',
                 someProp: 123,
                 anotherProp: 'abc'
             })
 
-            expect(verifyArgsAndStripIfElement([fakeObj, 'abc', 123])).toMatchObject([
+            expect(await verifyArgsAndStripIfElement([fakeObj, 'abc', 123], 'click')).toMatchObject([
                 { [ELEMENT_KEY]: 'foo-bar', ELEMENT: 'foo-bar' },
                 'abc',
                 123
             ])
         })
 
-        it('should work even if parameter is not of type Array', () => {
+        it('should work even if parameter is not of type Array', async() => {
             const fakeObj = new Element({
                 elementId: 'foo-bar',
                 someProp: 123,
                 anotherProp: 'abc'
             })
 
-            expect(verifyArgsAndStripIfElement(fakeObj)).toMatchObject(
+            expect(await verifyArgsAndStripIfElement(fakeObj, 'click')).toMatchObject(
                 { [ELEMENT_KEY]: 'foo-bar', ELEMENT: 'foo-bar' }
             )
-            expect(verifyArgsAndStripIfElement('foo')).toEqual('foo')
+            expect(await verifyArgsAndStripIfElement('foo', 'click')).toEqual('foo')
         })
 
-        it('throws error if element object is missing element id', () => {
+        it('throws error if element object is missing element id when using element commands', async () => {
             // @ts-ignore test scenario
             const fakeObj = new Element({
                 someProp: 123,
@@ -449,7 +449,18 @@ describe('utils', () => {
                 selector: 'div'
             })
 
-            expect(() => verifyArgsAndStripIfElement(fakeObj)).toThrow('The element with selector "div" you are trying to pass into the execute method wasn\'t found')
+            await expect(verifyArgsAndStripIfElement(fakeObj, 'click')).rejects.toThrow('Can\'t call click on element with selector "div" because element wasn\'t found')
+        })
+
+        it('throws error if element object is missing element id when using browser commands', async () => {
+            // @ts-ignore test scenario
+            const fakeObj = new Element({
+                someProp: 123,
+                anotherProp: 'abc',
+                selector: 'div'
+            })
+
+            await expect(verifyArgsAndStripIfElement(fakeObj, 'execute')).rejects.toThrow('Can\'t call execute with element, with selector "div" because it wasn\'t found')
         })
     })
 
