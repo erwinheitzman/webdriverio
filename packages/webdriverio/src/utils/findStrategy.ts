@@ -18,7 +18,7 @@ const XPATH_SELECTOR_REGEXP = [
     // optional . or # + class or id
     /(?:(\.|#)(-?[_a-zA-Z]+[_a-zA-Z0-9-]*))?/,
     // optional [attribute-name="attribute-selector"]
-    /(?:\[(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)(?:=(?:"|')([a-zA-z0-9\-_. ]+)(?:"|'))?\])?/,
+    /(?:\[(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)(?:=(?:"|')([a-zA-Z0-9\-_(). ]+)(?:"|'))?\])?/,
     // optional case insensitive
     /(\.)?/,
     // *=query or =query
@@ -104,7 +104,7 @@ const defineStrategy = function (selector: SelectorStrategy) {
     // Use name strategy if selector queries elements with name attributes for JSONWP
     // or if isMobile is used even when w3c is used
     // e.g. "[name='myName']" or '[name="myName"]'
-    if (stringSelector.search(/^\[name=("|')([a-zA-z0-9\-_.@=[\] ']+)("|')]$/) >= 0) {
+    if (stringSelector.search(/^\[name=("|')([a-zA-Z0-9\-_().@=[\] ']+)("|')]$/) >= 0) {
         return 'name'
     }
     // Allow to move up to the parent or select current element
@@ -232,7 +232,7 @@ export const findStrategy = function (selector: SelectorStrategy, isW3C?: boolea
     }
     case 'name': {
         if (isMobile || !isW3C) {
-            const match = stringSelector.match(/^\[name=("|')([a-zA-z0-9\-_.@=[\] ']+)("|')]$/)
+            const match = stringSelector.match(/^\[name=("|')([a-zA-Z0-9\-_().@=[\] ']+)("|')]$/)
             if (!match) {
                 throw new Error(`InvalidSelectorMatch. Strategy 'name' has failed to match '${stringSelector}'`)
             }

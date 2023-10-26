@@ -35,6 +35,18 @@ describe('selector strategies helper', () => {
         expect(element.value).toBe('search.input')
     })
 
+    it('should find an element using "name" method with parenthesis in the name', () => {
+        const element = findStrategy('[name="search()input"]')
+        expect(element.using).toBe('name')
+        expect(element.value).toBe('search()input')
+    })
+
+    it('should find an element using "name" method with uppercase characters in the name', () => {
+        const element = findStrategy('[name="SeArChInPuT"]')
+        expect(element.using).toBe('name')
+        expect(element.value).toBe('SeArChInPuT')
+    })
+
     it('should find an element using "name" method with an attribute', () => {
         const element = findStrategy('[name="searchinput[@isDisplayed=\'true\']"]')
         expect(element.using).toBe('name')
